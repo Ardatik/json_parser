@@ -30,7 +30,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "main",
-    "restfrmework",
+    "rest_framework",
     "django_filters",
     'drf_spectacular',
 ]
@@ -82,12 +82,6 @@ DATABASES = {
     },
 }
 
-CACHES = {
-    "default": {
-        "BACKEND": "redis_cache.RedisCache",
-        "LOCATION": "localhost:6379",
-    },
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
