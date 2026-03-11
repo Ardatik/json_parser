@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator, EmailValidator
 
 
 class Tag(models.Model):
@@ -15,13 +15,33 @@ class Product(models.Model):
     id = models.BigAutoField(primary_key=True, verbose_name="ID")
     title = models.CharField(max_length=250, verbose_name="Название")
     description = models.TextField(blank=True, null=True, verbose_name="Описание")
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена")
-    discount_percentage = models.DecimalField(
-        max_digits=5, decimal_places=2, null=True, blank=True, verbose_name="Цена"
+    price = models.DecimalField(
+        validators=[MinValueValidator(1)],
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Цена",
     )
-    rating = models.FloatField(blank=True, null=True, verbose_name="Рейтинг")
+    discount_percentage = models.DecimalField(
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name="Процент скидки",
+    )
+    rating = models.DecimalField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        max_digits=3,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        verbose_name="Рейтинг",
+    )
     stock = models.PositiveIntegerField(
-        blank=True, null=True, verbose_name="Остаток на складе"
+        validators=[MinValueValidator(0)],
+        blank=True,
+        null=True,
+        verbose_name="Остаток на складе",
     )
     tags = models.ManyToManyField(Tag, blank=True)
     brand = models.CharField(
@@ -68,7 +88,10 @@ class Product(models.Model):
 
 class Dimension(models.Model):
     product = models.OneToOneField(
-        Product, on_delete=models.CASCADE, related_name="dimensions", verbose_name="Товар"
+        Product,
+        on_delete=models.CASCADE,
+        related_name="dimensions",
+        verbose_name="Товар",
     )
     width = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="Ширина")
     height = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="Высота")
