@@ -8,9 +8,9 @@ class Tag(models.Model):
 
 class Product(models.Model):
     class AvailabilityStatus(models.TextChoices):
-        IN_STOCK = "in_stock"
-        OUT_OF_STOCK = "out_of_stock"
-        LOW_STOCK = "low_stock"
+        IN_STOCK = "In Stock"
+        OUT_OF_STOCK = "Out of Stock"
+        LOW_STOCK = "Low Stock"
 
     id = models.BigAutoField(primary_key=True, verbose_name="ID")
     title = models.CharField(max_length=250, verbose_name="Название")
@@ -27,9 +27,25 @@ class Product(models.Model):
     brand = models.CharField(
         max_length=250, blank=True, null=True, verbose_name="Бренд"
     )
+    sku = models.CharField(max_length=100, unique=True, verbose_name="Артикул")
+    weight = models.DecimalField(
+        max_digits=5, decimal_places=2, null=True, blank=True, verbose_name="Вес"
+    )
+    warranty_information = models.CharField(
+        max_length=200, blank=True, null=True, verbose_name="Гарантия"
+    )
+    shipping_information = models.CharField(
+        max_length=200, blank=True, null=True, verbose_name="Доставка"
+    )
     availability_status = models.CharField(
         max_length=20, choices=AvailabilityStatus.choices
     )
+    minimum_order_quantity = models.PositiveIntegerField(
+        validators=[MinValueValidator(1)],
+        verbose_name="Минимальное количество для заказа",
+    )
+    images = models.JSONField(default=list, verbose_name="Изображения")
+    thumbnail = models.URLField(verbose_name="Миниатюра")
     category = models.CharField(max_length=250, verbose_name="Категория")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
@@ -52,11 +68,11 @@ class Product(models.Model):
 
 class Dimension(models.Model):
     product = models.OneToOneField(
-        Product, on_delete=models.CASCADE, related_name="dimensions"
+        Product, on_delete=models.CASCADE, related_name="dimensions", verbose_name="Товар"
     )
-    width = models.DecimalField(max_digits=6, decimal_places=2)
-    height = models.DecimalField(max_digits=6, decimal_places=2)
-    depth = models.DecimalField(max_digits=6, decimal_places=2)
+    width = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="Ширина")
+    height = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="Высота")
+    depth = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="Глубина")
 
     class Meta:
         verbose_name = "Размер"
@@ -64,7 +80,6 @@ class Dimension(models.Model):
 
 
 class Review(models.Model):
-    id = models.BigAutoField(primary_key=True, verbose_name="ID")
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, verbose_name="Товар", related_name="reviews"
     )
